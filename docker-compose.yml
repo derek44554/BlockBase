@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  blockbase:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blockbase
+    ports:
+      - "24001:24001"
+    volumes:
+      - .:/app
+    environment:
+      - SIGNATURE_PATH=${SIGNATURE_PATH:-resources/signature.yml}
+      - TOP_VERIFY_PUBLIC_PEY_PATH=${TOP_VERIFY_PUBLIC_PEY_PATH:-resources/public_key_top.pem}
+      - NODE_PRIVATE_PEY_PATH=${NODE_PRIVATE_PEY_PATH:-resources/private_key.pem}
+      - IDENTITY=${IDENTITY}
+      - PYTHONUNBUFFERED=1
+    restart: always
+    command: uvicorn main:app --host 0.0.0.0 --port 24001 --workers 4
