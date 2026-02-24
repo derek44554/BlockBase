@@ -120,6 +120,9 @@ async def link_main_multiple(node_model: NodeModel, ins_cert: InsCert):
 
     tag = ins_cert.data.get("tag")
 
+    # 时间排序参数，可选值: "desc"(降序), "asc"(升序), 或 None(不排序)
+    order = ins_cert.data.get("order")
+
     # 校验BID是否存在
     block_model = get_block_by_bid(bid)
     if block_model is None:
@@ -130,6 +133,7 @@ async def link_main_multiple(node_model: NodeModel, ins_cert: InsCert):
         limit=limit,
         model=model,
         tag=tag,
+        order=order,
         permission_level=3,
     )
 
