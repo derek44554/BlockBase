@@ -1,5 +1,3 @@
-from apps.control import control_app
-
 from fastapi import FastAPI
 from blocklink.utils.block_api import BlackAPI
 
@@ -14,7 +12,6 @@ block_api = BlackAPI(app)
 
 block_api.add_app(block_app)
 block_api.add_app(ipfs_app)
-block_api.add_app(control_app)
 
 block_api.add_strategy(ConnectStrategy())
 block_api.add_strategy(DiscoverStrategy())
