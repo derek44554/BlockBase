@@ -1,7 +1,7 @@
 import requests
 from blocklink.utils.node_meta import NodeMeta
 
-ipfs_api = NodeMeta().get("ipfs_api")
+ipfs_api = NodeMeta()["ipfs_api"]
 
 
 def add_file_to_ipfs(file_path):
