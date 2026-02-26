@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ${CONTAINER_NAME:-${IDENTITY:-blockbase}}
+    container_name: ${CONTAINER_NAME:-blockbase}
     ports:
       - "${HOST_PORT:-24001}:24001"
     volumes:
