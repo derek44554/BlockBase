@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: blockbase
     ports:
-      - "24001:24001"
+      - "${HOST_PORT:-24001}:24001"
     volumes:
       - .:/app
     environment:
