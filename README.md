@@ -84,6 +84,9 @@ BlockBase/
 > 💡 确保在 BlockBase 项目根目录下执行以下命令
 
 ```bash
+# 创建网络
+docker network create block
+
 # 启动 Docker 容器
 docker-compose up -d
 ```
@@ -106,7 +109,37 @@ docker-compose down
 docker-compose up -d --build
 ```
 
+---
+## 图片上传对接
 
+### 创建IPFS容器
+
+```shell
+# 创建 IPFS 容器
+docker run -d \
+  --name ipfs \
+  --restart always \
+  --network block \
+  -v /home/IPFS:/data/ipfs \
+  -p 4001:4001 \
+  -p 127.0.0.1:5001:5001 \
+  -p 127.0.0.1:8080:8080 \
+  -e IPFS_PATH=/data/ipfs \
+  ipfs/go-ipfs:latest \
+  daemon --migrate=true --agent-version-suffix=docker
+```
+
+IPFS 持久化默认目录在 `/home/IPFS`
+
+### 节点对接
+
+在节点的`node.yml`文件里添加
+
+```yaml
+ipfs_api: http://ipfs:5001/api/v0
+```
+
+---
 ## 📄 许可证
 
 详见 [LICENSE](LICENSE) 文件
