@@ -122,8 +122,8 @@ docker run -d \
   --network block \
   -v /home/IPFS:/data/ipfs \
   -p 4001:4001 \
+  -p 8080:8080 \
   -p 127.0.0.1:5001:5001 \
-  -p 127.0.0.1:8080:8080 \
   -e IPFS_PATH=/data/ipfs \
   ipfs/go-ipfs:latest \
   daemon --migrate=true --agent-version-suffix=docker
