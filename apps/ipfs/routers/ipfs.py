@@ -1,3 +1,4 @@
+import hashlib
 import os
 import tempfile
 from pathlib import Path
@@ -37,9 +38,12 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
     """
     接收上传文件，保存到临时目录后上传并固定至 IPFS。
     """
-    ipfs_password = os.getenv("IPFS_PASSWORD")
+    ipfs_password = os.getenv("IDENTITY")
+
     if ipfs_password is None:
         raise HTTPException(status_code=403, detail="没有设置IPFS密码")
+
+    ipfs_password = hashlib.sha3_256(ipfs_password.encode()+"IPFS".encode('utf-8')).hexdigest()
 
     if password != ipfs_password:
         raise HTTPException(status_code=403, detail="密码错误")
