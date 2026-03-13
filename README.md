@@ -112,7 +112,11 @@ docker-compose up -d --build
 ---
 ## 图片上传对接
 
-### 创建IPFS容器
+### IPFS配置
+
+文件是存储在IPFS里的
+
+#### 创建IPFS容器
 
 ```shell
 # 创建 IPFS 容器
@@ -131,12 +135,35 @@ docker run -d \
 
 IPFS 持久化默认目录在 `/home/IPFS`
 
-### 节点对接
+#### 节点对接
 
 在节点的`node.yml`文件里添加
 
 ```yaml
 ipfs_api: http://ipfs:5001/api/v0
+```
+
+### .env 配置
+
+在项目目录里创建.env文件
+
+#### App配置密钥
+
+用于App端进行配置的密钥
+
+```text
+IDENTITY=App配置密钥
+```
+
+生成App配置密钥
+
+```python
+import os
+import base64
+
+random_bytes = os.urandom(32)
+# 你的App配置密钥
+b64_token = base64.b64encode(random_bytes).decode("utf-8")
 ```
 
 ---
