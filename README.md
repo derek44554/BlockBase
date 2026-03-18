@@ -7,7 +7,9 @@
 
 保存自己的个人数据
 
-客户端 [BlockBox](https://github.com/derek44554/block_box)
+[客户端](https://github.com/derek44554/block_box/releases)
+
+[介绍视频](https://www.bilibili.com/video/BV18PwezvE6w/)
 
 ## 🚀 快速开始
 
