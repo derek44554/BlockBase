@@ -195,3 +195,21 @@ async def link_main_multiple_by_targets(node_model: NodeModel, ins_cert: InsCert
         )
 
     return {"count": total, "page": page, "limit": limit, "items": items}
+
+
+@link_route.cert("/main/bids_by_targets")
+async def link_main_bids_by_targets(node_model: NodeModel, ins_cert: InsCert):
+    """
+    批量获取多个 target BID 对应指向它们的主块 BID 列表（不序列化 block 数据）
+    :param node_model:
+    :param ins_cert:
+    :return:
+    """
+    bids = ins_cert.data.get("bids", [])
+    order = ins_cert.data.get("order")
+
+    links = get_links_by_targets(bids, order=order)
+
+    main_bids = [link.main for link in links]
+
+    return {"count": len(main_bids), "bids": main_bids}
