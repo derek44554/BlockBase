@@ -207,8 +207,9 @@ async def link_main_bids_by_targets(node_model: NodeModel, ins_cert: InsCert):
     """
     bids = ins_cert.data.get("bids", [])
     order = ins_cert.data.get("order")
+    tag = ins_cert.data.get("tag")  # 可选标签，用于筛选
 
-    links = get_links_by_targets(bids, order=order)
+    links = get_links_by_targets(bids, order=order, tag=tag)
 
     main_bids = [link.main for link in links]
 

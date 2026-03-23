@@ -429,7 +429,7 @@ def get_links_by_target_paginated(bid: str, page: int, limit: int):
 
 
 # 批量获取 target 属于 bids 的链接列表
-def get_links_by_targets(bids: Iterable[str], order: Optional[str] = None):
+def get_links_by_targets(bids: Iterable[str], order: Optional[str] = None, tag: Optional[str] = None):
     bid_list = [bid for bid in bids if bid]
     if not bid_list:
         return []
@@ -440,8 +440,14 @@ def get_links_by_targets(bids: Iterable[str], order: Optional[str] = None):
             .where(LinkDB.target.in_(bid_list))
         )
         order_normalized = order.lower() if isinstance(order, str) else None
+
         if order_normalized in {"desc", "asc"}:
             statement = statement.join(BlockDB, BlockDB.bid == LinkDB.main, isouter=True)
+
+        if tag:
+            statement = statement.join(TagDB, TagDB.bid == LinkDB.main).where(TagDB.name == tag)
+
+        if order_normalized in {"desc", "asc"}:
             add_time_expr = BlockDB.add_time
             order_by_clause = (
                 add_time_expr.desc().nullslast()
