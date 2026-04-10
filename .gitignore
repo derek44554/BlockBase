@@ -46,8 +46,12 @@ node.yml
 *.sqlite3
 
 # Data directories (keep structure but ignore contents)
-data/*
-!data/.gitkeep
+data/connect/*
+!data/connect/.gitkeep
+data/database/*
+!data/database/.gitkeep
+data/signature/*
+!data/signature/.gitkeep
 resources/*
 !resources/.gitkeep
 apps/control/*
