@@ -67,7 +67,9 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"上传失败: {exc}")
+        # Log the actual exception for debugging while returning a generic message to the user
+        print(f"Upload failed: {exc}")
+        raise HTTPException(status_code=500, detail="上传失败: Internal Server Error")
     finally:
         try:
             if 'tmp_path' in locals() and tmp_path.exists():
