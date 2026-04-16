@@ -1,5 +1,6 @@
 import hashlib
 import os
+import secrets
 import tempfile
 from pathlib import Path
 
@@ -20,7 +21,7 @@ async def get_file(cid: str):
     获取IPFS文件
     """
     # Fetch the file data from IPFS
-    response = requests.post(f"{ipfs_api}/cat?arg={cid}")
+    response = requests.post(f"{ipfs_api}/cat", params={"arg": cid})
 
     # If the request fails, raise an error
     if response.status_code != 200:
@@ -45,7 +46,7 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
 
     ipfs_password = hashlib.sha3_256(ipfs_password.encode()+"IPFS".encode('utf-8')).hexdigest()
 
-    if password != ipfs_password:
+    if not secrets.compare_digest(password, ipfs_password):
         raise HTTPException(status_code=403, detail="密码错误")
 
     if file.filename is None:
@@ -66,8 +67,9 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
         return {"cid": cid}
     except HTTPException:
         raise
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"上传失败: {exc}")
+    except Exception:
+        # Don't leak internal error details to the user
+        raise HTTPException(status_code=500, detail="上传失败")
     finally:
         try:
             if 'tmp_path' in locals() and tmp_path.exists():
