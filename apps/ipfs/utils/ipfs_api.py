@@ -12,7 +12,7 @@ def add_file_to_ipfs(file_path):
     """
     with open(file_path, 'rb') as f:
         files = {'file': f}
-        response = requests.post(f"{ipfs_api}/add?pin=true", files=files)
+        response = requests.post(f"{ipfs_api}/add", params={"pin": "true"}, files=files)
         if response.status_code != 200:
             raise
         result = response.json()
@@ -25,7 +25,7 @@ def pin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/add?arg={cid}")
+    response = requests.post(f"{ipfs_api}/pin/add", params={"arg": cid})
     if response.status_code != 200:
         raise
 
@@ -48,7 +48,7 @@ def unpin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/rm?arg={cid}")
+    response = requests.post(f"{ipfs_api}/pin/rm", params={"arg": cid})
     if response.status_code != 200:
         raise
 
@@ -65,8 +65,8 @@ def garbage_collect():
 
 def get_file_chunk_from_ipfs(cid, chunk_size=1 * 1024 * 1024):
     # 通过 IPFS API 获取文件
-    ipfs_url = f"{ipfs_api}/cat?arg={cid}"
-    response = requests.post(ipfs_url)
+    ipfs_url = f"{ipfs_api}/cat"
+    response = requests.post(ipfs_url, params={"arg": cid})
 
     if response.status_code != 200:
         raise
