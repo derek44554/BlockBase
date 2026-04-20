@@ -70,7 +70,7 @@ async def link_target_multiple(node_model: NodeModel, ins_cert: InsCert):
     # 批量查询对应 BlockDB
     items = []
     if target_bids:
-        blocks = get_blocks_by_bids(target_bids)
+        blocks = get_blocks_by_bids(target_bids, permission_level=3)
         bid_to_block = {block.bid: block for block in blocks}
         # 按原 links 顺序返回对应的 block.json_data
         for target_bid in target_bids:
@@ -143,7 +143,7 @@ async def link_main_multiple(node_model: NodeModel, ins_cert: InsCert):
     # 批量查询对应 BlockDB
     items = []
     if main_bids:
-        blocks = get_blocks_by_bids(main_bids)
+        blocks = get_blocks_by_bids(main_bids, permission_level=3)
         bid_to_block = {block.bid: block for block in blocks}
         for main_bid in main_bids:
             block = bid_to_block.get(main_bid)
@@ -168,7 +168,7 @@ async def link_main_multiple_by_targets(node_model: NodeModel, ins_cert: InsCert
     # "desc", "asc"
     order = ins_cert.data.get("order")
 
-    links = get_links_by_targets(bids, order=order)
+    links = get_links_by_targets(bids, order=order, permission_level=3)
 
     total = len(links)
 
@@ -180,7 +180,7 @@ async def link_main_multiple_by_targets(node_model: NodeModel, ins_cert: InsCert
     paginated_links = links[start_index:end_index]
 
     main_bids = [link.main for link in paginated_links]
-    blocks = get_blocks_by_bids(main_bids)
+    blocks = get_blocks_by_bids(main_bids, permission_level=3)
     bid_to_block = {block.bid: block for block in blocks}
 
     items = []
@@ -209,7 +209,7 @@ async def link_main_bids_by_targets(node_model: NodeModel, ins_cert: InsCert):
     order = ins_cert.data.get("order")
     tag = ins_cert.data.get("tag")  # 可选标签，用于筛选
 
-    links = get_links_by_targets(bids, order=order, tag=tag)
+    links = get_links_by_targets(bids, order=order, tag=tag, permission_level=3)
 
     main_bids = [link.main for link in links]
 

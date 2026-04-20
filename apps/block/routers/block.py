@@ -100,7 +100,7 @@ async def block_multiple(node_model: NodeModel, ins_cert: InsCert):
         raise InsCertException(node=node_model, ins_cert=ins_cert, status_code=42)
 
     # 获取多个Block 列表
-    blocks = get_blocks_by_bids(bids)
+    blocks = get_blocks_by_bids(bids, permission_level=3)
 
     # -------------- 权限判断
 
@@ -108,4 +108,3 @@ async def block_multiple(node_model: NodeModel, ins_cert: InsCert):
     block_data = [block.json_data for block in blocks]
 
     return {"blocks": block_data, "deny_bids": []}
-

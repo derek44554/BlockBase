@@ -32,9 +32,22 @@ def get_block_by_bid(bid):
 
 
 # 获取多个 Block
-def get_blocks_by_bids(bids):
+def get_blocks_by_bids(bids, permission_level: int = 1):
+    if bids is None:
+        return []
+
     with Session(engine) as session:
         statement = select(BlockDB).filter(BlockDB.bid.in_(bids))
+
+        if permission_level == 1:
+            statement = statement.where(BlockDB.permission_level == 1)
+        elif permission_level == 2:
+            statement = statement.where(BlockDB.permission_level.in_([1, 2]))
+        elif permission_level == 3:
+            ...
+        else:
+            raise ValueError(f"Invalid permission_level: {permission_level}")
+
         block_dbs = session.exec(statement).all()
         for block in block_dbs or []:
             session.expunge(block)
@@ -429,7 +442,12 @@ def get_links_by_target_paginated(bid: str, page: int, limit: int):
 
 
 # 批量获取 target 属于 bids 的链接列表
-def get_links_by_targets(bids: Iterable[str], order: Optional[str] = None, tag: Optional[str] = None):
+def get_links_by_targets(
+        bids: Iterable[str],
+        order: Optional[str] = None,
+        tag: Optional[str] = None,
+        permission_level: int = 1,
+):
     bid_list = [bid for bid in bids if bid]
     if not bid_list:
         return []
@@ -440,8 +458,21 @@ def get_links_by_targets(bids: Iterable[str], order: Optional[str] = None, tag: 
             .where(LinkDB.target.in_(bid_list))
         )
         order_normalized = order.lower() if isinstance(order, str) else None
+        joined_block = False
 
-        if order_normalized in {"desc", "asc"}:
+        if permission_level in {1, 2, 3}:
+            statement = statement.join(BlockDB, BlockDB.bid == LinkDB.main, isouter=True)
+            joined_block = True
+            if permission_level == 1:
+                statement = statement.where(BlockDB.permission_level == 1)
+            elif permission_level == 2:
+                statement = statement.where(BlockDB.permission_level.in_([1, 2]))
+            elif permission_level == 3:
+                ...
+        else:
+            raise ValueError(f"Invalid permission_level: {permission_level}")
+
+        if order_normalized in {"desc", "asc"} and not joined_block:
             statement = statement.join(BlockDB, BlockDB.bid == LinkDB.main, isouter=True)
 
         if tag:
