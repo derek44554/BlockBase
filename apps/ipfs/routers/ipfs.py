@@ -20,7 +20,8 @@ async def get_file(cid: str):
     获取IPFS文件
     """
     # Fetch the file data from IPFS
-    response = requests.post(f"{ipfs_api}/cat?arg={cid}")
+    # ✅ FIX: Use 'params' argument to prevent URL parameter injection
+    response = requests.post(f"{ipfs_api}/cat", params={"arg": cid})
 
     # If the request fails, raise an error
     if response.status_code != 200:
@@ -66,8 +67,9 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
         return {"cid": cid}
     except HTTPException:
         raise
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"上传失败: {exc}")
+    except Exception:
+        # ✅ FIX: Avoid leaking internal exception details in error response
+        raise HTTPException(status_code=500, detail="上传失败: 服务器内部错误")
     finally:
         try:
             if 'tmp_path' in locals() and tmp_path.exists():

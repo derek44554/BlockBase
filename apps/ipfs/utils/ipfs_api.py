@@ -25,7 +25,8 @@ def pin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/add?arg={cid}")
+    # ✅ FIX: Use 'params' argument to prevent URL parameter injection
+    response = requests.post(f"{ipfs_api}/pin/add", params={"arg": cid})
     if response.status_code != 200:
         raise
 
@@ -48,7 +49,8 @@ def unpin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/rm?arg={cid}")
+    # ✅ FIX: Use 'params' argument to prevent URL parameter injection
+    response = requests.post(f"{ipfs_api}/pin/rm", params={"arg": cid})
     if response.status_code != 200:
         raise
 
@@ -65,8 +67,9 @@ def garbage_collect():
 
 def get_file_chunk_from_ipfs(cid, chunk_size=1 * 1024 * 1024):
     # 通过 IPFS API 获取文件
-    ipfs_url = f"{ipfs_api}/cat?arg={cid}"
-    response = requests.post(ipfs_url)
+    # ✅ FIX: Use 'params' argument to prevent URL parameter injection
+    ipfs_url = f"{ipfs_api}/cat"
+    response = requests.post(ipfs_url, params={"arg": cid})
 
     if response.status_code != 200:
         raise
