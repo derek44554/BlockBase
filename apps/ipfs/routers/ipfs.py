@@ -1,5 +1,7 @@
 import hashlib
+import logging
 import os
+import secrets
 import tempfile
 from pathlib import Path
 
@@ -19,18 +21,24 @@ async def get_file(cid: str):
     """
     获取IPFS文件
     """
-    # Fetch the file data from IPFS
-    response = requests.post(f"{ipfs_api}/cat?arg={cid}")
+    try:
+        # Fetch the file data from IPFS using params to prevent URL manipulation
+        response = requests.post(f"{ipfs_api}/cat", params={"arg": cid}, timeout=60)
 
-    # If the request fails, raise an error
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="File not found on IPFS")
+        # If the request fails, raise an error
+        if response.status_code != 200:
+            raise HTTPException(status_code=404, detail="File not found on IPFS")
 
-    # 使用 StreamingResponse 返回文件流
-    return StreamingResponse(
-        response.iter_content(chunk_size=8192),  # 分块传输
-        status_code=200
-    )
+        # 使用 StreamingResponse 返回文件流
+        return StreamingResponse(
+            response.iter_content(chunk_size=8192),  # 分块传输
+            status_code=200
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logging.error(f"IPFS get_file error: {exc}")
+        raise HTTPException(status_code=500, detail="获取文件失败")
 
 
 @ipfs_fast_api.post("/upload", summary="上传文件并固定到 IPFS")
@@ -45,7 +53,8 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
 
     ipfs_password = hashlib.sha3_256(ipfs_password.encode()+"IPFS".encode('utf-8')).hexdigest()
 
-    if password != ipfs_password:
+    # Use secrets.compare_digest to prevent timing attacks
+    if not secrets.compare_digest(password, ipfs_password):
         raise HTTPException(status_code=403, detail="密码错误")
 
     if file.filename is None:
@@ -67,7 +76,8 @@ async def upload_file(password: str = Form(...), file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"上传失败: {exc}")
+        logging.error(f"IPFS upload_file error: {exc}")
+        raise HTTPException(status_code=500, detail="上传失败")
     finally:
         try:
             if 'tmp_path' in locals() and tmp_path.exists():
