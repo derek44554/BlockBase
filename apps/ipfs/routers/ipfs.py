@@ -20,18 +20,23 @@ async def get_file(cid: str):
     """
     获取IPFS文件
     """
-    # Fetch the file data from IPFS
-    response = requests.post(f"{ipfs_api}/cat", params={"arg": cid})
+    try:
+        # Fetch the file data from IPFS with timeout and streaming enabled
+        response = requests.post(f"{ipfs_api}/cat", params={"arg": cid}, timeout=30, stream=True)
 
-    # If the request fails, raise an error
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="File not found on IPFS")
+        # If the request fails, raise an error
+        if response.status_code != 200:
+            raise HTTPException(status_code=404, detail="File not found on IPFS")
 
-    # 使用 StreamingResponse 返回文件流
-    return StreamingResponse(
-        response.iter_content(chunk_size=8192),  # 分块传输
-        status_code=200
-    )
+        # 使用 StreamingResponse 返回文件流
+        return StreamingResponse(
+            response.iter_content(chunk_size=8192),  # 分块传输
+            status_code=200
+        )
+    except requests.exceptions.Timeout:
+        raise HTTPException(status_code=504, detail="IPFS gateway timeout")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @ipfs_fast_api.post("/upload", summary="上传文件并固定到 IPFS")

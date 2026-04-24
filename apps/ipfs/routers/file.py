@@ -20,14 +20,14 @@ async def get_file(node_model: NodeModel, ins_cert: InsCert):
     # 通过CID 开始字节与结束字节进行索要 如果不存在就返回不存在的状态码
     cid = ins_cert.data["cid"]
     # 获取文件 分块
-    file_data_chunks = get_file_chunk_from_ipfs(cid)
-    for i, chunk in enumerate(file_data_chunks):
-        print(f"Chunk {i}: {len(chunk)} bytes")
+    file_data_stream, total_count = get_file_chunk_from_ipfs(cid)
+
+    for i, chunk in enumerate(file_data_stream):
         data = {
             "cid": cid,
             "index": i,  # 索引 0 开始
             "data": base64.b64encode(chunk).decode('utf-8'),  # 数据
-            "count": len(file_data_chunks),
+            "count": total_count,
         }
         ins_cert_factory = InsCertFactory()
         ins = ins_cert_factory.create(receiver=ins_cert.sender, routing="/res/file", data=data,

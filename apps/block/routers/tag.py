@@ -45,6 +45,4 @@ async def tag_multiple(node_model: NodeModel, ins_cert: InsCert):
     # 准备要发送的数据
     items = [block.json_data for block in blocks]
 
-    print(items)
-
     return {"count": total, "page": page, "limit": limit, "items": items}
