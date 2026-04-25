@@ -12,12 +12,12 @@ from .routers.link_api import link_fast_api
 # 创建数据库
 create_db()
 
-block_app = RouteApp("/block", title="Block")
-block_app.add(block_route)
-block_app.add(link_route)
-block_app.add(tag_route)
-block_app.add(write_route)
-block_app.add(delete_route)
+route_app = RouteApp("/block", title="Block")
+route_app.add(block_route)
+route_app.add(link_route)
+route_app.add(tag_route)
+route_app.add(write_route)
+route_app.add(delete_route)
 
-block_app.add_api(name="/block", api_router=block_fast_api)
-block_app.add_api(name="/link", api_router=link_fast_api)
+route_app.add_api(name="/block", api_router=block_fast_api)
+route_app.add_api(name="/link", api_router=link_fast_api)

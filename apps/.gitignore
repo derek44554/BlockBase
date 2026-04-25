@@ -1,0 +1,10 @@
+*
+!.gitignore
+!block/
+!block/**
+!ipfs/
+!ipfs/**
+block/**/__pycache__/
+ipfs/**/__pycache__/
+block/**/*.py[cod]
+ipfs/**/*.py[cod]
