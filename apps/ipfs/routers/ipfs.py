@@ -21,10 +21,12 @@ async def get_file(cid: str):
     获取IPFS文件
     """
     # Fetch the file data from IPFS
-    response = requests.post(f"{ipfs_api}/cat", params={"arg": cid})
+    # Sentinel: Added stream=True and timeout to prevent DoS via OOM or hanging connections
+    response = requests.post(f"{ipfs_api}/cat", params={"arg": cid}, stream=True, timeout=30)
 
     # If the request fails, raise an error
     if response.status_code != 200:
+        response.close()
         raise HTTPException(status_code=404, detail="File not found on IPFS")
 
     # 使用 StreamingResponse 返回文件流
