@@ -1,4 +1,4 @@
-blocklink==0.1.6
+blocklink==0.1.7
 setuptools
 cryptography
 pyyaml
