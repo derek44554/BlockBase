@@ -24,6 +24,14 @@ async def apps_disable_cert(node_model: NodeModel, ins_cert: InsCert):
     """
     name = ins_cert.data.get("name")
 
+    if name == "apps":
+        raise InsCertException(
+            node=node_model,
+            ins_cert=ins_cert,
+            status_code=42,
+            content="Uninstallation is prohibited apps",
+        )
+
     if not isinstance(name, str) or not name:
         raise InsCertException(
             node=node_model,
