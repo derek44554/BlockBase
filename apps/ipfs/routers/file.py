@@ -22,7 +22,6 @@ async def get_file(node_model: NodeModel, ins_cert: InsCert):
     # 获取文件 分块
     file_data_chunks = get_file_chunk_from_ipfs(cid)
     for i, chunk in enumerate(file_data_chunks):
-        print(f"Chunk {i}: {len(chunk)} bytes")
         data = {
             "cid": cid,
             "index": i,  # 索引 0 开始
