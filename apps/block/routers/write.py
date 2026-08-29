@@ -26,7 +26,6 @@ async def simple(node_model: NodeModel, ins_cert: InsCert):
     # 要获取的BID
     bid = ins_cert.data.get("bid")
     model = ins_cert.data.get("model")
-    print(ins_cert.data)
 
     # 是否 BID错误
     if bid is None or len(bid) != 32:

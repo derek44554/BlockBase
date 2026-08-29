@@ -12,7 +12,7 @@ def add_file_to_ipfs(file_path):
     """
     with open(file_path, 'rb') as f:
         files = {'file': f}
-        response = requests.post(f"{ipfs_api}/add", params={"pin": "true"}, files=files)
+        response = requests.post(f"{ipfs_api}/add", params={"pin": "true"}, files=files, timeout=30)
         if response.status_code != 200:
             raise
         result = response.json()
@@ -25,7 +25,7 @@ def pin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/add", params={"arg": cid})
+    response = requests.post(f"{ipfs_api}/pin/add", params={"arg": cid}, timeout=30)
     if response.status_code != 200:
         raise
 
@@ -35,7 +35,7 @@ def list_pins():
     pin文件的列表
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/ls")
+    response = requests.post(f"{ipfs_api}/pin/ls", timeout=30)
     if response.status_code != 200:
         raise
     pins = response.json().get("Keys", {})
@@ -48,7 +48,7 @@ def unpin_cid(cid):
     :param cid:
     :return:
     """
-    response = requests.post(f"{ipfs_api}/pin/rm", params={"arg": cid})
+    response = requests.post(f"{ipfs_api}/pin/rm", params={"arg": cid}, timeout=30)
     if response.status_code != 200:
         raise
 
@@ -58,25 +58,30 @@ def garbage_collect():
     垃圾回收
     :return:
     """
-    response = requests.post(f"{ipfs_api}/repo/gc")
+    response = requests.post(f"{ipfs_api}/repo/gc", timeout=60)
     if response.status_code != 200:
         raise
 
 
 def get_file_chunk_from_ipfs(cid, chunk_size=1 * 1024 * 1024):
     # 通过 IPFS API 获取文件
+    # Added stream=True and timeout to prevent OOM
     ipfs_url = f"{ipfs_api}/cat"
-    response = requests.post(ipfs_url, params={"arg": cid})
+    response = requests.post(ipfs_url, params={"arg": cid}, stream=True, timeout=30)
 
     if response.status_code != 200:
+        response.close()
         raise
 
     file_data_chunks = []
 
-    # 按块大小分割内容并存储到列表
-    for i in range(0, len(response.content), chunk_size):
-        chunk = response.content[i:i + chunk_size]
-        file_data_chunks.append(chunk)
+    try:
+        # 按块大小分割内容并存储到列表
+        # We build the list from the stream to avoid loading the whole file at once before chunking
+        for chunk in response.iter_content(chunk_size=chunk_size):
+            file_data_chunks.append(chunk)
+    finally:
+        response.close()
 
     return file_data_chunks
 
